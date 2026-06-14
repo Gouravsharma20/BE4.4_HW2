@@ -4,6 +4,8 @@ const express = require("express")
 
 const app = express()
 
+initializeDatabase();
+
 app.use(express.json())
 
 const fs = require("fs")
@@ -17,11 +19,29 @@ app.get("/",(req,res)=>{
     res.json("welcome to my Hotel express app")
 })
 
+async function deleteHotels(hotelId) {
+    try {
+        const deleteHotel = await Hotel.findByIdAndDelete(hotelId)
+        return deleteHotel
+    } catch(err) {
+        console.log("an error occured while deleting hotels")
+    }
+}
+
+app.delete("/hotels/:hotelId",async(req,res)=>{
+    const hotelId = req.params.hotelId
+    try {
+        const deletedMovie = await deleteHotels(hotelId)
+        return deletedMovie
+    } catch(err){
+        return res.status(500).json({error:"unable to delete hotels data",errDetails:err.message})
+    }
+})
+
 
 
 
 async function createHotels(newHotel){
-    await initializeDatabase()
     try{
         const hotel = new Hotel(newHotel)
         const saveHotel = await hotel.save()
@@ -40,10 +60,38 @@ app.post("/hotels",async(req,res)=>{
     }
 })
 
+// all hotels
+
+async function getAllHotels() {
+    try {
+        const hotels = await Hotel.find()
+        return hotels
+    } catch (err) {
+        throw err
+    }
+}
+
+
+app.get("/hotels", async (req, res) => {
+    try {
+        const hotels = await getAllHotels()
+
+        return res.status(200).json({
+            message: "Hotels fetched successfully",
+            hotelsData: hotels
+        })
+    } catch (err) {
+        return res.status(500).json({
+            error: "Unable to fetch hotels data",
+            errDetails: err.message
+        })
+    }
+})
+
 const hotelData = JSON.parse(jsonData)
 
 
-const PORT = 7726
+const PORT = 7730
 
 app.listen(PORT,()=>{
     console.log(`App is running on Port ${PORT}`)
