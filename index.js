@@ -29,10 +29,15 @@ async function deleteHotels(hotelId) {
 }
 
 app.delete("/hotels/:hotelId",async(req,res)=>{
-    const hotelId = req.params.hotelId
     try {
-        const deletedMovie = await deleteHotels(hotelId)
-        return deletedMovie
+        const hotelsId = req.params.hotelId
+        const deletedMovie = await deleteHotels(hotelsId)
+        if (!deletedMovie) {
+            return res.status(404).json({
+                error: "Hotel not found"
+            });
+        }
+        return res.status(200).json({message:"hotel data added successfully",hotelData:deletedMovie})
     } catch(err){
         return res.status(500).json({error:"unable to delete hotels data",errDetails:err.message})
     }
@@ -91,7 +96,8 @@ app.get("/hotels", async (req, res) => {
 const hotelData = JSON.parse(jsonData)
 
 
-const PORT = 7730
+
+const PORT = 7737
 
 app.listen(PORT,()=>{
     console.log(`App is running on Port ${PORT}`)
