@@ -11,7 +11,6 @@ app.use(express.json())
 const fs = require("fs")
 
 const Hotel = require("./model/HotelModel.js")
-const { error } = require("console")
 
 const jsonData = fs.readFileSync("./data/hotelData.json","utf-8")
 
@@ -22,7 +21,7 @@ app.get("/",(req,res)=>{
 async function updateHotel(hotelId,dataToUpdate) {
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(hotelId,dataToUpdate,{new:true})
-        if (!updateHotel) {
+        if (!updatedHotel) {
             console.log("updated data is not available")
         }
         return updatedHotel
@@ -36,7 +35,7 @@ app.post("/hotels/:id",async(req,res)=>{
         const id = req.params.id
         const updatedData = await updateHotel(id,req.body)
         if (!updatedData) {
-            return res.status(404).json({error:"data not founds",errorDetails:err.message})
+            return res.status(404).json({error:"data not found"})
         } else {
             return res.status(200).json({message:"data updated successfully",updatedRestraunt:updatedData})
         }
@@ -78,10 +77,12 @@ const hotelData = JSON.parse(jsonData)
 
 
 
-const PORT = 7741
+// const PORT = 7741
 
-app.listen(PORT,()=>{
-    console.log(`App is running on Port ${PORT}`)
-})
+// app.listen(PORT,()=>{
+//     console.log(`App is running on Port ${PORT}`)
+// })
+
+module.exports = app
 
 
