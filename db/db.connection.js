@@ -4,10 +4,21 @@ dotenv.config();
 
 const mongoDbUrl = process.env.mongoDbUrl;
 
+// async function initializeDatabase() {
+//     await mongoose.connect(mongoDbUrl)
+//         .then(() => { console.log("Connected to database") })
+//         .catch((err) => { console.log("Error connecting", err) });
+// }
+
 async function initializeDatabase() {
-    await mongoose.connect(mongoDbUrl)
-        .then(() => { console.log("Connected to database") })
-        .catch((err) => { console.log("Error connecting", err) });
+    try {
+        await mongoose.connect(mongoDbUrl);
+        console.log("Connected to database");
+    } catch (err) {
+        console.error("Error connecting database:", err);
+        throw err;
+    }
 }
+
 
 module.exports = { initializeDatabase };
