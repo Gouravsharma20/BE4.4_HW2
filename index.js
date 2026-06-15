@@ -19,49 +19,30 @@ app.get("/",(req,res)=>{
     res.json("welcome to my Hotel express app")
 })
 
-async function deleteHotels(hotelId) {
+async function updateHotel(hotelId,dataToUpdate) {
     try {
-        const deleteHotel = await Hotel.findByIdAndDelete(hotelId)
-        return deleteHotel
-    } catch(err) {
-        console.log("an error occured while deleting hotels")
-    }
-}
-
-app.delete("/hotels/:hotelId",async(req,res)=>{
-    try {
-        const hotelsId = req.params.hotelId
-        const deletedMovie = await deleteHotels(hotelsId)
-        if (!deletedMovie) {
-            return res.status(404).json({
-                error: "Hotel not found"
-            });
+        const updatedHotel = await Hotel.findByIdAndUpdate(hotelId,dataToUpdate,{new:true})
+        if (!updateHotel) {
+            console.log("updated data is not available")
         }
-        return res.status(200).json({message:"hotel data added successfully",hotelData:deletedMovie})
-    } catch(err){
-        return res.status(500).json({error:"unable to delete hotels data",errDetails:err.message})
-    }
-})
-
-
-
-
-async function createHotels(newHotel){
-    try{
-        const hotel = new Hotel(newHotel)
-        const saveHotel = await hotel.save()
-        return saveHotel
-    } catch(err) {
-        console.log("Error loading Hotels",err)
+        return updatedHotel
+    } catch (err) {
+        console.log("an error occured while updating hotel data")
     }
 }
 
-app.post("/hotels",async(req,res)=>{
+app.post("/hotels/:id",async(req,res)=>{
     try {
-        const addedHotel = await createHotels(req.body)
-        return res.status(201).json({message:"new Hotel Added successfully",hotelData:addedHotel})
-    } catch(err){
-        return res.status(500).json({error:"an erro occured while adding hotels"})
+        const id = req.params.id
+        const updatedData = await updateHotel(id,req.body)
+        if (!updatedData) {
+            return res.status(404).json({error:"data not founds",errorDetails:err.message})
+        } else {
+            return res.status(200).json({message:"data updated successfully",updatedRestraunt:updatedData})
+        }
+
+    } catch(err) {
+        return res.status(500).json({error:"an unexpected error occured while updating hotel api",errorDetails:err.message})
     }
 })
 
@@ -97,7 +78,7 @@ const hotelData = JSON.parse(jsonData)
 
 
 
-const PORT = 7737
+const PORT = 7741
 
 app.listen(PORT,()=>{
     console.log(`App is running on Port ${PORT}`)
